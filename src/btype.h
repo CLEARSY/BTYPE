@@ -140,6 +140,9 @@ class BTypeFactory {
       const std::vector<std::pair<std::string, std::shared_ptr<BType>>>
           &fields);
 
+  static size_t size();
+  static std::shared_ptr<BType> at(size_t index);
+
   // Get a named type (abstract set or enumerated set)
   static std::shared_ptr<BType> Named(const std::string &name);
 

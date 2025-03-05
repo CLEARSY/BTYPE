@@ -24,6 +24,36 @@ class BTypeTest : public ::testing::Test {
   void SetUp() override {}
 };
 
+// Tests for BTypeFactory size and at methods
+TEST_F(BTypeTest, FactorySizeAndAt) {
+  // Ensure the factory is initially empty
+  EXPECT_EQ(BTypeFactory::size(), 0);
+
+  // Create some types
+  auto intType = BTypeFactory::Integer();
+  auto boolType = BTypeFactory::Boolean();
+  auto floatType = BTypeFactory::Float();
+
+  // Check the size after creating types
+  EXPECT_EQ(BTypeFactory::size(), 3);
+
+  // Check the types at specific indices
+  EXPECT_EQ(BTypeFactory::at(0)->getKind(), BType::Kind::INTEGER);
+  EXPECT_EQ(BTypeFactory::at(1)->getKind(), BType::Kind::BOOLEAN);
+  EXPECT_EQ(BTypeFactory::at(2)->getKind(), BType::Kind::FLOAT);
+
+  // Create more types
+  auto realType = BTypeFactory::Real();
+  auto stringType = BTypeFactory::String();
+
+  // Check the size after creating more types
+  EXPECT_EQ(BTypeFactory::size(), 5);
+
+  // Check the types at specific indices
+  EXPECT_EQ(BTypeFactory::at(3)->getKind(), BType::Kind::REAL);
+  EXPECT_EQ(BTypeFactory::at(4)->getKind(), BType::Kind::STRING);
+}
+
 // Basic Types Tests
 TEST_F(BTypeTest, BasicTypesCreation) {
   auto intType = BTypeFactory::Integer();
