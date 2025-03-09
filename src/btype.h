@@ -20,6 +20,7 @@
 #define BTYPE_H
 
 #include <algorithm>
+#include <cstdint>
 #include <exception>
 #include <memory>
 #include <utility>
@@ -35,6 +36,13 @@ class BTypeCache;
  * This class is the base for representations of B types.
  * It provides a common interface for all types and ensures maximal sharing
  * through the use of the BTypeFactory.
+ *
+ * BType instances should never be created directly, but only through the
+ * BTypeFactory class.
+ *
+ * Types are internally represented in a table. The index of the type in
+ * the table may be queried using the BType::index() method, and it is possible
+ * get the type at a given index using the BTypeFactory::at() method.
  */
 class BType : public std::enable_shared_from_this<BType> {
  public:
@@ -145,13 +153,15 @@ class BType : public std::enable_shared_from_this<BType> {
   virtual size_t hash_combine(size_t seed) const;
 
   friend class BTypeFactory;
+  friend class BTypeCache;
 
   /**
    * @brief Constructor for BType. Only BTypeFactory can create
    * instances.
    * @param kind The kind of BType to create.
    */
-  BType(Kind kind) : m_kind{kind}, m_hash_valid(false), m_hash(0) {};
+  BType(Kind kind)
+      : m_kind{kind}, m_index{SIZE_MAX}, m_hash_valid(false), m_hash(0) {};
   virtual ~BType() = default;
   /**
    * @brief Gets the hash value of the BType.
@@ -166,6 +176,13 @@ class BType : public std::enable_shared_from_this<BType> {
     return m_hash;
   }
 
+  /** @bref Gets the position in the BTypeFactory table
+   * @return The index of the BType in the BTypeFactory table
+   *
+   * The index matches the creation order.
+   */
+  size_t index() const { return m_index; }
+
  private:
   /** @brief Deleted copy constructor to prevent copying. */
   BType(const BType &) = delete;
@@ -173,6 +190,12 @@ class BType : public std::enable_shared_from_this<BType> {
   BType &operator=(const BType &) = delete;
   /** @brief The kind of BType. */
   Kind m_kind;
+
+ protected:
+  /** @brief The position of the BType in the BTypeFactory table */
+  size_t m_index;
+
+ private:
   /** @brief Flag to indicate if the hash value is valid. */
   mutable bool m_hash_valid = false;
   /** @brief Cached hash value. */

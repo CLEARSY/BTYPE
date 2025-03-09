@@ -66,6 +66,7 @@ class BTypeCache {
 
   void index(std::shared_ptr<BType> type) {
     std::unique_lock<std::shared_mutex> writeLock(m_mutexIndex);
+    type->m_index = m_index.size();
     m_index.push_back(type);
   }
 

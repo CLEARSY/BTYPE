@@ -58,3 +58,23 @@ target_link_libraries(btype_xml_write_tests
 )
 
 add_test(NAME btype_xml_write_tests COMMAND btype_xml_write_tests)
+
+add_executable(btype_index_tests
+    btype_index_tests.cpp
+)
+
+target_include_directories(btype_index_tests
+    PRIVATE
+        ${PROJECT_SOURCE_DIR}/src
+)
+
+target_link_libraries(btype_index_tests
+    PRIVATE
+        btype
+        GTest::GTest
+        GTest::Main
+        Threads::Threads
+        fmt::fmt
+)
+
+add_test(NAME btype_index_tests COMMAND btype_index_tests)

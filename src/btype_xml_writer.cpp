@@ -10,10 +10,6 @@
 
 void BTypeFactory::writeXMLRichTypesInfo(std::ostream &os) {
   std::size_t nbTypes = BTypeFactory::size();
-  std::map<std::shared_ptr<BType>, int> reverseIndex;
-  for (auto i = 0u; i < nbTypes; i++) {
-    reverseIndex[BTypeFactory::at(i)] = i;
-  }
   os << "<RichTypesInfo>\n";
   for (auto i = 0u; i < nbTypes; i++) {
     auto type = BTypeFactory::at(i);
@@ -53,8 +49,8 @@ void BTypeFactory::writeXMLRichTypesInfo(std::ostream &os) {
           <xs:attribute name="arg" type="xs:integer">
         </xs:complexType>
         */
-        os << "    <PowerSet arg=\""
-           << reverseIndex[type->toPowerType()->m_content] << "\"/>\n";
+        os << "    <PowerSet arg=\"" << type->toPowerType()->m_content->index()
+           << "\"/>\n";
         break;
       case BType::Kind::ProductType:
         /*
@@ -64,8 +60,8 @@ void BTypeFactory::writeXMLRichTypesInfo(std::ostream &os) {
         </xs:complexType>
         */
         os << "    <CartesianProduct"
-           << " arg1=\"" << reverseIndex[type->toProductType()->lhs] << "\""
-           << " arg2=\"" << reverseIndex[type->toProductType()->rhs] << "\""
+           << " arg1=\"" << type->toProductType()->lhs->index() << "\""
+           << " arg2=\"" << type->toProductType()->rhs->index() << "\""
            << "/>\n";
         break;
       case BType::Kind::AbstractSet:
@@ -82,8 +78,7 @@ void BTypeFactory::writeXMLRichTypesInfo(std::ostream &os) {
           <xs:complexType name="EnumeratedSet">
           <xs:attribute name="name" type="xs:string"/>
           <xs:sequence>
-            <xs:element name="EnumeratedValue" type="EnumeratedValue"
-          minOccurs="1" maxOccurs="unbounded" />
+            <xs:element name="EnumeratedValue" type="EnumeratedValue"/>
           </xs:sequence>
           </xs:complexType>
         */
@@ -105,8 +100,7 @@ void BTypeFactory::writeXMLRichTypesInfo(std::ostream &os) {
         /*
           <xs:complexType name="StructType">
           <xs:sequence>
-            <xs:element name="Field" type="Field" minOccurs="1"
-          maxOccurs="unbounded" />
+            <xs:element name="Field" type="Field"/>
           </xs:sequence>
           </xs:complexType>
         */
@@ -121,7 +115,7 @@ void BTypeFactory::writeXMLRichTypesInfo(std::ostream &os) {
             </xs:complexType>
           */
           os << "      <Field name=\"" << field.first << "\" type=\""
-             << reverseIndex[field.second] << "\"/>\n";
+             << field.second->index() << "\"/>\n";
         }
         os << "    </StructType>\n";
         break;
