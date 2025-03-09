@@ -19,6 +19,7 @@ endif()
 
 find_package(fmt REQUIRED)
 find_package(Threads REQUIRED)
+find_package(tinyxml2 REQUIRED)
 
 add_subdirectory(src)
 

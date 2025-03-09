@@ -1,6 +1,10 @@
-/*
-   This file is part of BTYPE.
-   Copyright © CLEARSY 2025
+/* @file btype_factory.cpp
+   @brief Implementation file for most of BTypeFactory class.
+
+   @note This file is part of BTYPE.
+   @copyright Copyright © CLEARSY 2025
+   @license GNU General Public License (GPL) version 3
+
    BTYPE is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or

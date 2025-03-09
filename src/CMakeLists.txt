@@ -6,6 +6,7 @@ add_library(btype
     btype.h
     btype_factory.cpp
     btype_xml_writer.cpp
+    btype_xml_reader.cpp
     btype_fmt.h
 )
 
@@ -14,5 +15,6 @@ target_link_libraries(btype
     PRIVATE
         Threads::Threads
         fmt::fmt
+        tinyxml2::tinyxml2
 )
 

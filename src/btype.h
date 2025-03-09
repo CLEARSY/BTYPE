@@ -26,6 +26,10 @@
 #include <utility>
 #include <vector>
 
+namespace tinyxml2 {
+class XMLElement;
+};
+
 // Forward declaration
 class BTypeFactory;
 class BTypeCache;
@@ -270,6 +274,14 @@ class BTypeFactory {
    * @note the produced XML is compatible with the schema in RichTypesInfo.xsd
    */
   static void writeXMLRichTypesInfo(std::ostream &os);
+
+ public:
+  /**
+   * @brief Builds B types from an XML document following RichTypesInfo schema
+   * @param root The tinyxml2 XML element RichTypeInfos
+   * @throw BTypeFactory::Exception if the XML is invalid or parsing fails
+   */
+  static void buildFromXML(const tinyxml2::XMLElement *root);
 
  private:
   // Basic types (initialized in cpp file)
