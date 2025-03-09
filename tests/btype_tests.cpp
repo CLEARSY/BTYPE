@@ -110,7 +110,7 @@ TEST_F(BTypeTest, EnumeratedSetCreation) {
   auto enumType = enumSet->toEnumeratedSetType();
   ASSERT_NE(enumType, nullptr);
   EXPECT_EQ(enumType->getName(), "Colors");
-  EXPECT_EQ(enumType->getContent(), values);
+  EXPECT_EQ(enumType->getValues(), values);
 }
 
 // Record Type Tests

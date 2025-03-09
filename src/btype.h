@@ -1,6 +1,10 @@
-/*
-   This file is part of BTYPE.
-   Copyright © CLEARSY 2025
+/* @file btype.h
+   @brief Header file for the BType class and BTypeFactory class.
+
+   @note This file is part of BTYPE.
+   @copyright Copyright © CLEARSY 2025
+   @license GNU General Public License (GPL) version 3
+
    BTYPE is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
@@ -25,8 +29,20 @@
 class BTypeFactory;
 class BTypeCache;
 
+/**
+ * @brief Abstract base class representing types of the B-method language.
+ *
+ * This class is the base for representations of B types.
+ * It provides a common interface for all types and ensures maximal sharing
+ * through the use of the BTypeFactory.
+ */
 class BType : public std::enable_shared_from_this<BType> {
  public:
+  /* @brief Enumeration of the different kinds of types.
+   *
+   * This enumeration lists the different kinds of types that can be represented
+   * by the BType class.
+   */
   enum class Kind {
     INTEGER,
     BOOLEAN,
@@ -41,18 +57,48 @@ class BType : public std::enable_shared_from_this<BType> {
   };
   Kind getKind() const { return m_kind; };
 
+  /** @brief Nested class representing a Cartesian product type. */
   class ProductType;
+  /** @brief Nested class representing a power set type. */
   class PowerType;
+  /** @brief Nested class representing a struct type. */
   class StructType;
+  /** @brief Nested class representing an abstract set type. */
   class AbstractSet;
+  /** @brief Nested class representing an enumerated set type. */
   class EnumeratedSet;
 
+  /** @brief converts to a ProductType, if possible
+   * @return a shared pointer to the ProductType, or nullptr if the conversion
+   * is not possible
+   */
   std::shared_ptr<const ProductType> toProductType() const;
+  /** @brief converts to a PowerType, if possible
+   * @return a shared pointer to the PowerType, or nullptr if the conversion is
+   * not possible
+   */
   std::shared_ptr<const PowerType> toPowerType() const;
+  /** @brief converts to a Struct, if possible
+   * @return a shared pointer to the Struct, or nullptr if the conversion is not
+   * possible
+   */
   std::shared_ptr<const StructType> toStructType() const;
+  /** @brief converts to an AbstractSet, if possible
+   * @return a shared pointer to the AbstractSet, or nullptr if the conversion
+   * is not possible
+   */
   std::shared_ptr<const AbstractSet> toAbstractSetType() const;
+  /** @brief converts to an EnumeratedSet, if possible
+   * @return a shared pointer to the EnumeratedSet, or nullptr if the conversion
+   * is not possible
+   */
   std::shared_ptr<const EnumeratedSet> toEnumeratedSetType() const;
 
+  /**
+   * @brief Abstract visitor class for the BType hierarchy.
+   *
+   * Implementors can derive from this class to perform specific actions.
+   */
   class Visitor {
    public:
     virtual void visitINTEGER() = 0;
@@ -91,14 +137,27 @@ class BType : public std::enable_shared_from_this<BType> {
     return compare(*this, other) >= 0;
   }
 
+  /**
+   * @brief Combines the hash of this BType with a seed value.
+   * @param seed The initial seed value.
+   * @return The combined hash value.
+   */
   virtual size_t hash_combine(size_t seed) const;
 
   friend class BTypeFactory;
-  Kind m_kind;
 
-  // Only the factory can create BType instances.
+  /**
+   * @brief Constructor for BType. Only BTypeFactory can create
+   * instances.
+   * @param kind The kind of BType to create.
+   */
   BType(Kind kind) : m_kind{kind}, m_hash_valid(false), m_hash(0) {};
   virtual ~BType() = default;
+  /**
+   * @brief Gets the hash value of the BType.
+   * @return The hash value.
+   * @note The hash is computed lazily and cached.
+   */
   size_t hash() const {
     if (!m_hash_valid) {
       m_hash = hash_combine(0);
@@ -108,13 +167,25 @@ class BType : public std::enable_shared_from_this<BType> {
   }
 
  private:
+  /** @brief Deleted copy constructor to prevent copying. */
   BType(const BType &) = delete;
+  /** @brief Deleted assignment operator to prevent assignment. */
   BType &operator=(const BType &) = delete;
+  /** @brief The kind of BType. */
+  Kind m_kind;
+  /** @brief Flag to indicate if the hash value is valid. */
   mutable bool m_hash_valid = false;
+  /** @brief Cached hash value. */
   mutable size_t m_hash;
 };
 
-// Factory class for creating BType instances
+/**
+ * @brief Factory class for creating and managing BType instances.
+ *
+ * This class ensures maximal sharing of BType instances and provides
+ * thread-safe access to create and retrieve BTypes. It implements
+ * the Factory pattern and Singleton-like behavior.
+ */
 class BTypeFactory {
  public:
   // Delete constructor, copy constructor and assignment operator
@@ -140,10 +211,24 @@ class BTypeFactory {
       const std::vector<std::pair<std::string, std::shared_ptr<BType>>>
           &fields);
 
+  /**
+   * @brief Gets the number of BTypes created by the factory.
+   * @return The number of BTypes.
+   */
   static size_t size();
+  /**
+   * @brief Gets the BType at a specific index in the factory's internal index.
+   * @param index The index of the BType to retrieve.
+   * @return A shared pointer to the BType at the given index.
+   */
   static std::shared_ptr<BType> at(size_t index);
 
-  // Get a named type (abstract set or enumerated set)
+  /**
+   * @brief Gets a named BType (AbstractSet or EnumeratedSet) by name.
+   * @param name The name of the BType.
+   * @return A shared pointer to the named BType, or nullptr if not found.
+   * @note Not yet implemented.
+   */
   static std::shared_ptr<BType> Named(const std::string &name);
 
   class Exception : public std::exception {
@@ -154,6 +239,14 @@ class BTypeFactory {
    private:
     std::string msg;
   };
+
+  /*@desc writes the type table in XML format to the output stream
+   * @param os the output stream
+   * @return void
+   *
+   * @note the produced XML is compatible with the schema in RichTypesInfo.xsd
+   */
+  static void writeXMLRichTypesInfo(std::ostream &os);
 
  private:
   // Basic types (initialized in cpp file)
@@ -217,7 +310,7 @@ class BType::EnumeratedSet : public BType {
   void accept(Visitor &v) const override { v.visitEnumeratedSet(*this); }
 
   const std::string &getName() const { return m_name; }
-  const std::vector<std::string> &getContent() const { return m_values; }
+  const std::vector<std::string> &getValues() const { return m_values; }
   const std::string m_name;
   const std::vector<std::string> m_values;
   EnumeratedSet(const std::pair<std::string, std::vector<std::string>> &values)
@@ -240,6 +333,10 @@ class BType::StructType : public BType {
   static std::vector<std::pair<std::string, std::shared_ptr<BType>>> sort(
       const std::vector<std::pair<std::string, std::shared_ptr<BType>>>
           &fields);
+  const std::vector<std::pair<std::string, std::shared_ptr<BType>>> &getFields()
+      const {
+    return m_fields;
+  }
   StructType(
       const std::vector<std::pair<std::string, std::shared_ptr<BType>>> &fields)
       : BType(BType::Kind::Struct), m_fields{sort(fields)} {}

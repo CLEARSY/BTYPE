@@ -5,6 +5,7 @@ add_library(btype
     btype.cpp
     btype.h
     btype_factory.cpp
+    btype_xml_writer.cpp
     btype_fmt.h
 )
 
