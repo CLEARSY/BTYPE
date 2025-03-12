@@ -207,8 +207,7 @@ class BTypeCache {
       if (it != m_powerTypes.end()) {
         return it->second;
       }
-      newType =
-          std::shared_ptr<BType::PowerType>(new BType::PowerType(content));
+      newType = std::make_shared<BType::PowerType>(content);
       m_powerTypes[content] = newType;
     }
     index(newType);
